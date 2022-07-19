@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * @Description
  * @Date 2022/7/18 10:46
  */
-public class MainApp {
+public class _01_supplyAsync {
 
     /**
      * 1、小白点菜
@@ -33,21 +33,19 @@ public class MainApp {
          *
          * 注意：这种方法启动的是一个异步的线程
          */
-        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(
-                () -> {
-                    SmallTool.printTimeAndThread("厨师炒菜");
-                    SmallTool.sleepMillis(200); // 厨师炒菜花了200ms
-                    SmallTool.printTimeAndThread("厨师打饭");
-                    SmallTool.sleepMillis(100); // 厨师打饭花了100ms
-                    return "番茄炒蛋 + 米饭 做好了";
-                });
+        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {
+            SmallTool.printTimeAndThread("厨师炒菜");
+            SmallTool.sleepMillis(200); // 厨师炒菜花了200ms
+            SmallTool.printTimeAndThread("厨师打饭");
+            SmallTool.sleepMillis(100); // 厨师打饭花了100ms
+            return "番茄炒蛋 + 米饭 做好了";
+        });
 
         // 小白线程点完餐后，继续打游戏
         SmallTool.printTimeAndThread("小白在打王者");
 
         /**
-         * 这里 {@link CompletableFuture#join()} 方法的返回值类型就是上面
-         * CompletableFuture 的泛型，它的返回值就是 {@link Supplier#get()} 方法的返回值
+         * 这里 {@link CompletableFuture#join()} 方法的返回值就是异步任务的执行结果，即 {@link Supplier#get()} 方法的返回值。
          *
          * 这个 join 方法就是旧版 Future 接口中 get 方法的升级版，join 方法也会等待任务结束后返回任务的执行结果。
          * 但是，与 get 方法相比，这个 join 方法不需要我们手动 catch 异常。因为其抛出的都是运行期异常，当然，

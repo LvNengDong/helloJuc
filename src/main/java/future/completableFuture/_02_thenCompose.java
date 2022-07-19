@@ -3,16 +3,14 @@ package future.completableFuture;
 import utils.SmallTool;
 
 import java.util.concurrent.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @Author lnd
  * @Description 一般餐厅里厨师只负责炒菜，像打饭这种事情，一般都会交给服务员。所以这里会出现第三个线程（服务员线程）
  * @Date 2022/7/18 11:16
  */
-public class MainApp2 {
+public class _02_thenCompose {
 
     public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             0,
@@ -67,7 +65,7 @@ public class MainApp2 {
 
 
     /**
-     * 但是，对于这种『第一个任务结束后再开启第二个』的场景，{@link CompletableFuture} 提供了更方便的方式，
+     * 对于这种『第一个任务结束后再开启第二个』的场景（即两个任务间有依赖关系），{@link CompletableFuture} 提供了更方便的方式，
      * <p>
      * 方法 {@link CompletableFuture#thenCompose(Function)} 可以轻松实现这种场景。
      * <p>
@@ -84,7 +82,7 @@ public class MainApp2 {
                     SmallTool.sleepMillis(200);
                     return "番茄炒蛋";
                 })
-                .thenCompose( // 串行
+                .thenCompose( // 异步线程执行串行任务
                         // 开启一个新的异步线程让服务员去打饭（在前一个任务执行完后，下一个任务才会触发）
                         preResult -> CompletableFuture.supplyAsync(() -> {
                             SmallTool.printTimeAndThread("服务员打饭");
@@ -105,10 +103,12 @@ public class MainApp2 {
         ----------------------------------- */
 
         /**
-         * 如果不使用线程池，对于这段代码来说，可能存在线程复用的问题，即厨师线程在炒完菜后，这个线程ID又被服务员线程拿到了，
-         * 这样就会出现炒菜的线程和打饭的线程是同一个线程的问题，但这是OK的，只是造成展示输出的效果不明显。
-         * 为了解决这个问题，我们可以引入一个线程池，这个线程池中只有一个线程，并且用完后立即销毁，这样每次处理任务的线程号就是不同的了。
-         * 具体代码见 {@link MainApp2#thenComposeCaseNew()}
+         * {@link CompletableFuture} 底层应该有默认的线程池，因此对于这段代码来说，可能存在线程复用的问题。
+         * 即厨师线程在炒完菜后，这个线程ID又被服务员线程拿到了，这样就会出现炒菜的线程和打饭的线程是同一个线程的问题，
+         * 但代码是OK的，只是造成展示输出的效果不明显。
+         *
+         * 为了解决这个问题，我们可以引入自定义的线程池，这个线程池中只有一个线程，并且用完后立即销毁，这样每次处理任务的线程号就是不同的了。
+         * 具体代码见 {@link _02_thenCompose#thenComposeCaseNew()}
          */
     }
 
@@ -125,14 +125,14 @@ public class MainApp2 {
             SmallTool.printTimeAndThread("厨师炒菜");
             SmallTool.sleepMillis(200); // 厨师炒菜花了200ms
 
-            // 厨师炒完菜后，再开启一个新的异步线程让服务员去打饭
+            // 厨师炒完菜后，再开启一个新的异步线程让服务员去打饭（注意：厨师炒完菜后服务员才去打饭，虽然使用了两个不同的线程，但任务的顺序是串行的）
             CompletableFuture<String> cf2 = CompletableFuture.supplyAsync(() -> {
                 SmallTool.printTimeAndThread("服务员打饭");
                 SmallTool.sleepMillis(100); // 厨师打饭花了100ms
                 return " + 米饭";
             });
 
-            // 厨师准备好『番茄炒蛋』，等待服务员打好『米饭』后，就可端给小白吃了
+            // 厨师准备好『番茄炒蛋』，等待服务员打好『米饭』后，就可以端给小白吃了
             return "番茄炒蛋 + " + cf2.join() + "做好了";
         });
 

@@ -16,7 +16,7 @@ import java.util.function.Function;
  * 4、刚打完电话，服务员就把发票送了过来，于是小白走出餐厅，准备回家。
  * @Date 2022/7/18 21:26
  */
-public class MainApp4 {
+public class _04_thenApply {
 
     public static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             0,
@@ -41,21 +41,17 @@ public class MainApp4 {
         SmallTool.printTimeAndThread("小白：结账 -> 把钱给服务员 -> 要求开发票");
         // 开启新的异步线程（服务员线程）
         CompletableFuture<String> cf1 = CompletableFuture
-                .supplyAsync(
-                        () -> {
-                            SmallTool.printTimeAndThread("服务员收款500元");
-                            SmallTool.sleepMillis(100); // 收款花了100ms
-                            return "500";
-                        }
-                )
-                .thenApplyAsync(
-                        (money) -> {
-                            // 得到500元收款后，另一个线程（服务员）去给小白开发票
-                            SmallTool.printTimeAndThread("服务员去开发票");
-                            SmallTool.sleepMillis(200); // 开票花了200ms
-                            return String.format("%s元发票", money);
-                        }, threadPool
-                );
+                .supplyAsync(() -> {
+                    SmallTool.printTimeAndThread("服务员收款500元");
+                    SmallTool.sleepMillis(100); // 收款花了100ms
+                    return "500";
+                })
+                .thenApplyAsync((money) -> {
+                    // 得到500元收款后，另一个线程（服务员）去给小白开发票
+                    SmallTool.printTimeAndThread("服务员去开发票");
+                    SmallTool.sleepMillis(200); // 开票花了200ms
+                    return String.format("%s元发票", money);
+                }, threadPool);
         // 在服务员开发票期间，小白一直在打电话约朋友开黑
         SmallTool.printTimeAndThread("小白：一直在打电话约朋友开黑");
 
@@ -87,23 +83,20 @@ public class MainApp4 {
     private static void thenApplyCase() {
         SmallTool.printTimeAndThread("小白吃好了");
         SmallTool.printTimeAndThread("小白：结账 -> 把钱给服务员 -> 要求开发票");
+
         // 开启新的异步线程（服务员线程）
         CompletableFuture<String> cf1 = CompletableFuture
-                .supplyAsync(
-                        () -> {
-                            SmallTool.printTimeAndThread("服务员收款500元");
-                            SmallTool.sleepMillis(100); // 收款花了100ms
-                            return "500";
-                        }
-                )
-                .thenApply(
-                        (money) -> {
-                            // 得到500元收款后，另一个线程（服务员）去给小白开发票
-                            SmallTool.printTimeAndThread("服务员去开发票");
-                            SmallTool.sleepMillis(200); // 开票花了200ms
-                            return String.format("%s元发票", money);
-                        }
-                );
+                .supplyAsync(() -> {
+                    SmallTool.printTimeAndThread("服务员收款500元");
+                    SmallTool.sleepMillis(100); // 收款花了100ms
+                    return "500";
+                })
+                .thenApply((money) -> {
+                    // 得到500元收款后，另一个线程（服务员）去给小白开发票
+                    SmallTool.printTimeAndThread("服务员去开发票");
+                    SmallTool.sleepMillis(200); // 开票花了200ms
+                    return String.format("%s元发票", money);
+                });
         // 在服务员开发票期间，小白一直在打电话约朋友开黑
         SmallTool.printTimeAndThread("小白：一直在打电话约朋友开黑");
 
@@ -126,22 +119,19 @@ public class MainApp4 {
         SmallTool.printTimeAndThread("小白吃好了");
         SmallTool.printTimeAndThread("小白：结账 -> 把钱给服务员 -> 要求开发票");
         // 开启新的异步线程（服务员线程）
-        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(
-                () -> {
-                    SmallTool.printTimeAndThread("服务员收款500元");
-                    SmallTool.sleepMillis(100); // 收款花了100ms
-                    // // 得到500元收款后，另一个线程（服务员）去给小白开发票
-                    CompletableFuture<String> cf2 = CompletableFuture.supplyAsync(
-                            () -> {
-                                SmallTool.printTimeAndThread("服务员去开发票");
-                                SmallTool.sleepMillis(200); // 开票花了200ms
-                                return "500元发票";
-                            }
-                    );
+        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {
+            SmallTool.printTimeAndThread("服务员收款500元");
+            SmallTool.sleepMillis(100); // 收款花了100ms
 
-                    return cf2.join();
-                }
-        );
+            // 得到500元收款后，另一个线程（服务员）去给小白开发票
+            CompletableFuture<String> cf2 = CompletableFuture.supplyAsync(() -> {
+                SmallTool.printTimeAndThread("服务员去开发票");
+                SmallTool.sleepMillis(200); // 开票花了200ms
+                return "500元发票";
+            });
+            return cf2.join();
+        });
+
         // 在服务员开发票期间，小白一直在打电话约朋友开黑
         SmallTool.printTimeAndThread("小白：一直在打电话约朋友开黑");
 
@@ -170,15 +160,13 @@ public class MainApp4 {
         SmallTool.printTimeAndThread("小白吃好了");
         SmallTool.printTimeAndThread("小白：结账 -> 把钱给服务员 -> 要求开发票");
         // 开启新的异步线程（服务员线程）
-        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(
-                () -> {
-                    SmallTool.printTimeAndThread("服务员收款500元");
-                    SmallTool.sleepMillis(100); // 收款花了100ms
-                    SmallTool.printTimeAndThread("服务员开发票，面额 500元");
-                    SmallTool.sleepMillis(200); // 开票花了200ms
-                    return "500元发票";
-                }
-        );
+        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {
+            SmallTool.printTimeAndThread("服务员收款500元");
+            SmallTool.sleepMillis(100); // 收款花了100ms
+            SmallTool.printTimeAndThread("服务员开发票，面额 500元");
+            SmallTool.sleepMillis(200); // 开票花了200ms
+            return "500元发票";
+        });
 
         // 在服务员开发票期间，小白一直在打电话约朋友开黑
         SmallTool.printTimeAndThread("小白：一直在打电话约朋友开黑");

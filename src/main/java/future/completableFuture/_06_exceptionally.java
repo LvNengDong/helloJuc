@@ -6,35 +6,35 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * @Author lnd
- * @Description
- *      小白坐上了700路公交，又拿起电话跟朋友聊天，聊得正起劲，
- *      哐当一声，公交撞树上了。
- *      小白碰上这事儿丝毫不慌，从车上下来，从路边拦了个出租车，叫到出租车后顺利回家
- *
+ * @Description 小白坐上了700路公交，又拿起电话跟朋友聊天，聊得正起劲，
+ * 哐当一声，公交撞树上了。
+ * 小白碰上这事儿丝毫不慌，从车上下来，从路边拦了个出租车，叫到出租车后顺利回家
  * @Date 2022/7/18 23:54
  */
-public class MainApp6 {
+public class _06_exceptionally {
 
     public static void main(String[] args) {
         SmallTool.printTimeAndThread("小白走出餐厅，来到公交车站");
         SmallTool.printTimeAndThread("等待 700路 或者 800路 公交到来");
 
-        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {
-            SmallTool.printTimeAndThread("700路公交正在赶来");
-            SmallTool.sleepMillis(100);
-            return "700路公交到了";
-        }).applyToEither(
-                CompletableFuture.supplyAsync(() -> {
-                    SmallTool.printTimeAndThread("800路公交正在赶来");
-                    SmallTool.sleepMillis(200);
-                    return "800路公交到了";
-                }), firstComeBus -> {
-                    SmallTool.printTimeAndThread(firstComeBus);
-                    if (firstComeBus.startsWith("700")){
-                        throw new RuntimeException(firstComeBus + "，撞树了");
-                    }
-                    return firstComeBus;
+        CompletableFuture<String> cf1 = CompletableFuture
+                .supplyAsync(() -> {
+                    SmallTool.printTimeAndThread("700路公交正在赶来");
+                    SmallTool.sleepMillis(100);
+                    return "700路公交到了";
                 })
+                .applyToEither(
+                        CompletableFuture.supplyAsync(() -> {
+                            SmallTool.printTimeAndThread("800路公交正在赶来");
+                            SmallTool.sleepMillis(200);
+                            return "800路公交到了";
+                        }), firstComeBus -> {
+                            SmallTool.printTimeAndThread(firstComeBus);
+                            if (firstComeBus.startsWith("700")) {
+                                throw new RuntimeException(firstComeBus + "，撞树了");
+                            }
+                            return firstComeBus;
+                        })
                 /**
                  * 由于我们是在尾部加的 exceptionally ，所以上面链式调用的任何一段出现问题，都会进入 exceptionally 中。
                  * 当然，exceptionally 并不是只能加在尾部，也可以在链式操作的中间加。
