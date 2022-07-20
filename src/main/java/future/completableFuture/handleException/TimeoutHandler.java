@@ -32,7 +32,7 @@ public class TimeoutHandler {
      * 线程池
      */
     public ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            0,
+            3,
             Integer.MAX_VALUE,
             0,
             TimeUnit.SECONDS,
@@ -48,7 +48,7 @@ public class TimeoutHandler {
                     SmallTool.sleepMillis(executeTime);
 
                     // 模拟异常
-                    //int i = 1 / 0;
+                    int i = 1 / 0;
 
                     // 任务执行成功
                     flag = true;
@@ -65,7 +65,7 @@ public class TimeoutHandler {
                 )
                 .exceptionally(ex -> {
                     // 处理异常
-                    System.out.println("Exception" + ex.getMessage());
+                    SmallTool.printTimeAndThread("Exception" + ex.getMessage());
                     return null;
                 });
 
@@ -78,8 +78,8 @@ public class TimeoutHandler {
 
 
     public static void main(String[] args) {
-        //TimeoutHandler timeoutHandler = new TimeoutHandler(1000L, 2000L);
-        TimeoutHandler timeoutHandler = new TimeoutHandler(2000L, 2000L);
+        TimeoutHandler timeoutHandler = new TimeoutHandler(3000L, 2000L);
+        //TimeoutHandler timeoutHandler = new TimeoutHandler(2000L, 3000L);
         timeoutHandler.start();
 
         /* 执行超时的情况：
@@ -95,5 +95,13 @@ public class TimeoutHandler {
         1658232292422	|	12	|	ForkJoinPool.commonPool-worker-1	|	数据传输中，预估耗时2000毫秒
         1658232294427	|	1	|	main	|	程序执行成功
         ----------------------------------- */
+
+        /* 出现异常的情况：
+        --------------------------------------
+        1658309932444	|	13	|	ForkJoinPool.commonPool-worker-2	|	我是守护线程，我最多只等3000毫秒
+        1658309932444	|	12	|	ForkJoinPool.commonPool-worker-1	|	数据传输中，预估耗时2000毫秒
+        1658309934460	|	12	|	ForkJoinPool.commonPool-worker-1	|	Exceptionjava.lang.ArithmeticException: / by zero
+        -----------------------------------
+        */
     }
 }
