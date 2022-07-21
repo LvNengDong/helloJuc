@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 解决：通过组会中讨论的方式，我们最终得出的一个解决方案就是：如果主线程中的任务对分支线程中的任务不具有强依赖性的话，我们可以把获取
  * 分支线程执行结果的代码放到监听器中去作，这样主线程就永远不会被阻塞了。
+ *
+ * 但其实不需要把回调写在监听器中，主线程也不会被阻塞，具体测试过程可见 {@link ListenerCatchResultZero}
  * @Date 2022/7/21 16:48
  */
 public class ListenerCatchResult {
