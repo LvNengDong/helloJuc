@@ -10,6 +10,9 @@ import java.util.Objects;
 public class Test01 {
 
     public static void main(String[] args) {
+
+
+
         // 使用可变对象做Map的key
         HashMap<User, String> map = new HashMap<>();
         User user1 = new User(1);
