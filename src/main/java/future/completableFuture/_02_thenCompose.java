@@ -34,7 +34,7 @@ public class _02_thenCompose {
         SmallTool.printTimeAndThread("小白进入餐厅");
         SmallTool.printTimeAndThread("小白点了 番茄炒蛋 + 一碗米饭");
 
-        // 开启一个新的异步线程让厨师去炒饭
+        // 开启一个新的线程让厨师去炒饭
         CompletableFuture<String> cf1 = CompletableFuture
                 .supplyAsync(() -> {
                     SmallTool.printTimeAndThread("厨师炒菜");
@@ -42,7 +42,7 @@ public class _02_thenCompose {
                     return "番茄炒蛋";
                 }, threadPool)
                 .thenCompose( // 串行
-                        // 开启一个新的异步线程让服务员去打饭（在前一个任务执行完后，下一个任务才会触发）
+                        // 开启一个新的线程让服务员去打饭（在前一个任务执行完后，下一个任务才会触发）
                         preResult -> CompletableFuture.supplyAsync(() -> {
                             SmallTool.printTimeAndThread("服务员打饭");
                             SmallTool.sleepMillis(100);
@@ -128,7 +128,7 @@ public class _02_thenCompose {
             // 厨师炒完菜后，再开启一个新的异步线程让服务员去打饭（注意：厨师炒完菜后服务员才去打饭，虽然使用了两个不同的线程，但任务的顺序是串行的）
             CompletableFuture<String> cf2 = CompletableFuture.supplyAsync(() -> {
                 SmallTool.printTimeAndThread("服务员打饭");
-                SmallTool.sleepMillis(100); // 厨师打饭花了100ms
+                SmallTool.sleepMillis(100); // 服务员打饭花了100ms
                 return " + 米饭";
             });
 
